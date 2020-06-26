@@ -8,12 +8,12 @@ You want to clone the repo into somewhere like
 =~/.emacs.d/elpa/plumhtml-1.0.0/= then do ~M-x package-install-file
 ox-plumhtml.el~
 ** Functions
-- ~ox-plumhtml-export-as-html~
+*** ~ox-plumhtml-export-as-html~
 Makes a temporary buffer with the exported HTML.
-- ~ox-plumhtml-export-to-html~
+*** ~ox-plumhtml-export-to-html~
 Like ~ox-plumhtml-export-as-html~ but dumps the exported HTML to a
 file like =example.org= -> =example.html=
-- ~ox-plumhtml-publish-to-html~
+*** ~ox-plumhtml-publish-to-html~
 Same as ~ox-plumhtml-export-as-html~ but for ~org-publish~
 ** Tests
 I stole them from =ox-slimhtml= lole
