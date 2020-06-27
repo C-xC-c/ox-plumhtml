@@ -1,11 +1,10 @@
 * PlumHTML
 org-export backend for sane HTML. Basically some changes and
-extensions (currently just tables) to [[https://github.com/balddotcat/ox-slimhtml][ox-slimhtml]]. 
+extensions to [[https://github.com/balddotcat/ox-slimhtml][ox-slimhtml]]. 
 
 Used to publish words I write.
 ** Installation
-You want to clone the repo into somewhere like
-=~/.emacs.d/elpa/plumhtml-1.0.0/= then do ~M-x package-install-file
+You want to clone the repo, cd to it then do ~M-x package-install-file
 ox-plumhtml.el~
 ** Functions
 *** ~ox-plumhtml-export-as-html~

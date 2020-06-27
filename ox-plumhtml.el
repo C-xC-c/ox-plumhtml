@@ -3,9 +3,9 @@
 
 ;; Author: Plum <boku@plum.moe>
 ;; Created: June 2020
-;; Package-Version: 1.0.0
+;; Package-Version: 1.0.1
 ;; Keywords: org-export
-;; URL: https://code.plum.moe/plumhtml
+;; URL: https://words.plum.moe/ox-plumhtml.html
 ;; Package-Requires: ((emacs "24") (ox-slimhtml "0.4.5"))
 
 ;; This file is not part of GNU Emacs
@@ -32,6 +32,7 @@
 
 ;; Utils
 (defun ox-plumhtml--table-header-p (element info)
+  "Returns `t' if the table has a header else `nil'"
   (or (org-export-table-has-header-p element info)
       (org-export-table-has-header-p (org-export-get-parent-table element) info)))
 
@@ -53,7 +54,7 @@
 
 (defun ox-plumhtml-table-row (table-row contents info)
   "Transcodes an org table-row to HTML
-Implements <thead> and <tbody>"
+Implement <thead> and <tbody>"
   (when (eq 'standard (org-element-property :type table-row))
     (let* ((open (org-export-table-row-starts-rowgroup-p table-row info))
            (close (org-export-table-row-ends-rowgroup-p table-row info))
@@ -67,7 +68,7 @@ Implements <thead> and <tbody>"
              ((or (equal '(above) open)
                   (equal '(bottom) close)
                   first-row)
-              '("<tbody>" . "</tbody>")))))
+              '("<tbody>" . "</tbody>"))))
       (concat (and (or open first-row) (car tags))
               (format "<tr>%s</tr>" contents)
               (and close (cdr tags))))))
@@ -80,6 +81,12 @@ Uses <th> for table headers"
       (format "<th>%s</th>" contents)
     (format "<td>%s</td>" contents)))
 
+(defun ox-plumhtml-code (code contents info)
+  (format "<code>%s</code>" (org-element-property :value code)))
+
+(defun ox-plumhtml-verbatim (verbatim contents info)
+  (format "<code>%s</code>" (org-element-property :value verbatim)))
+
 ;; org-export backend and export/publish functions
 (org-export-define-derived-backend 'plumhtml
     'slimhtml
@@ -87,7 +94,9 @@ Uses <th> for table headers"
   '((table . ox-plumhtml-table)
     (table-row . ox-plumhtml-table-row)
     (table-cell . ox-plumhtml-table-cell)
-    (paragraph . ox-plumhtml-paragraph)))
+    (paragraph . ox-plumhtml-paragraph)
+    (code . ox-plumhtml-code)
+    (verbatim . ox-plumhtml-verbatim)))
 
 ;;;###autoload
 (defun ox-plumhtml-publish-to-html (plist filename pub-dir)
