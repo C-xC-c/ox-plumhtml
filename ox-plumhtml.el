@@ -3,7 +3,7 @@
 
 ;; Author: Plum <boku@plum.moe>
 ;; Created: June 2020
-;; Package-Version: 1.0.1
+;; Package-Version: 1.0.2
 ;; Keywords: org-export
 ;; URL: https://words.plum.moe/ox-plumhtml.html
 ;; Package-Requires: ((emacs "24") (ox-slimhtml "0.4.5"))
@@ -68,7 +68,7 @@ Implement <thead> and <tbody>"
              ((or (equal '(above) open)
                   (equal '(bottom) close)
                   first-row)
-              '("<tbody>" . "</tbody>"))))
+              '("<tbody>" . "</tbody>")))))
       (concat (and (or open first-row) (car tags))
               (format "<tr>%s</tr>" contents)
               (and close (cdr tags))))))
