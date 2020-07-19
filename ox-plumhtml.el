@@ -3,7 +3,7 @@
 
 ;; Author: Plum <boku@plum.moe>
 ;; Created: June 2020
-;; Package-Version: 1.0.2
+;; Package-Version: 1.1.0
 ;; Keywords: org-export
 ;; URL: https://words.plum.moe/ox-plumhtml.html
 ;; Package-Requires: ((emacs "26.1") (ox-slimhtml "0.4.5"))
@@ -29,7 +29,6 @@
 
 ;;; Code:
 (require 'ox-slimhtml)
-ox-slimhtml
 
 ;; Variables
 (defvar ox-plumhtml-export-header-ids nil)
