@@ -1,4 +1,4 @@
-;;; ox-plumhtml.el --- sane HTML export for org-mode -*- lexical-binding: t; -*-
+;;; ox-plumhtml.el --- Sane HTML export for org-mode -*- lexical-binding: t; -*-
 ;; Copyright (C) 2020 Plum
 
 ;; Author: Plum <boku@plum.moe>
@@ -6,7 +6,7 @@
 ;; Package-Version: 1.0.2
 ;; Keywords: org-export
 ;; URL: https://words.plum.moe/ox-plumhtml.html
-;; Package-Requires: ((emacs "24") (ox-slimhtml "0.4.5"))
+;; Package-Requires: ((emacs "26.1") (ox-slimhtml "0.4.5"))
 
 ;; This file is not part of GNU Emacs
 
@@ -29,10 +29,14 @@
 
 ;;; Code:
 (require 'ox-slimhtml)
+ox-slimhtml
+
+;; Variables
+(defvar ox-plumhtml-export-header-ids nil)
 
 ;; Utils
 (defun ox-plumhtml--table-header-p (element info)
-  "Returns `t' if the table has a header else `nil'"
+  "Return t if the table has a header else nil."
   (or (org-export-table-has-header-p element info)
       (org-export-table-has-header-p (org-export-get-parent-table element) info)))
 
@@ -82,10 +86,63 @@ Uses <th> for table headers"
     (format "<td>%s</td>" contents)))
 
 (defun ox-plumhtml-code (code contents info)
-  (format "<code>%s</code>" (org-element-property :value code)))
+  (format "<code>%s</code>" (org-html-do-format-code (org-element-property :value code))))
 
 (defun ox-plumhtml-verbatim (verbatim contents info)
   (format "<code>%s</code>" (org-element-property :value verbatim)))
+
+(defun ox-plumhtml-headline (headline contents info)
+  (let* ((text (org-export-data (org-element-property :title headline) info))
+         (level (org-export-get-relative-level headline info))
+         (attributes (org-element-property :ATTR_HTML headline))
+         (container (org-element-property :HTML_CONTAINER headline))
+         (container-class (and container (org-element-property :HTML_CONTAINER_CLASS headline))))
+    (when attributes
+      (setq attributes
+            (format " %s" (org-html--make-attribute-string
+                           (org-export-read-attribute 'attr_html `(nil
+                                                                   (attr_html ,(split-string attributes))))))))
+    (when (not (org-export-low-level-p headline info))
+      (if ox-plumhtml-export-header-ids
+          (format "<h%d id=\"%s\">%s</h%d>%s" level (org-export-get-reference headline info) text level (or contents ""))
+        (format "<h%d%s>%s</h%d>%s" level (or attributes "") text level (or contents ""))))))
+
+(defun ox-plumhtml-link (link contents info)
+  "Transcode LINK from Org to HTML.
+
+CONTENTS is the text of the link.
+INFO is a plist holding contextual information."
+  (cond
+   ((ox-slimhtml--immediate-child-of-p link 'link)
+    (org-element-property :raw-link link))
+   ((not contents)
+    (format "<em>%s</em>" (org-element-property :path link)))
+   (t (let ((link-type (org-element-property :type link))
+            (href (org-element-property :raw-link link))
+            (attributes (if (ox-slimhtml--immediate-child-of-p link 'paragraph)
+                            (ox-slimhtml--attr (org-export-get-parent link))
+                          ""))
+            (element "<a href=\"%s\"%s>%s</a>"))
+        (cond
+         ((string= "file" link-type)
+          (let ((html-extension (or (plist-get info :html-extension) ""))
+                (use-abs-url (plist-get info :html-link-use-abs-url))
+                (link-org-files-as-html (plist-get info :html-link-org-as-html))
+                (path (or (org-element-property :path link) "")))
+            (format element
+                    (concat (if (and use-abs-url (file-name-absolute-p path)) "file:" "")
+                            (if (and link-org-files-as-html (string= "org" (downcase (or (file-name-extension path) ""))))
+                                (if (and html-extension (not (string= "" html-extension)))
+                                    (concat (file-name-sans-extension path) "." html-extension)
+                                  (file-name-sans-extension path))
+                              path))
+                    attributes contents)))
+         ((and (string= "fuzzy" link-type)
+               ox-plumhtml-export-header-ids)
+          (format "<a href=\"#%s\"%s>%s</a>"
+                  (org-export-get-reference (org-export-resolve-fuzzy-link link info) info)
+                  attributes contents))
+         (t (format element href attributes contents)))))))
 
 ;; org-export backend and export/publish functions
 (org-export-define-derived-backend 'plumhtml
@@ -96,7 +153,9 @@ Uses <th> for table headers"
     (table-cell . ox-plumhtml-table-cell)
     (paragraph . ox-plumhtml-paragraph)
     (code . ox-plumhtml-code)
-    (verbatim . ox-plumhtml-verbatim)))
+    (verbatim . ox-plumhtml-verbatim)
+    (headline . ox-plumhtml-headline)
+    (link . ox-plumhtml-link)))
 
 ;;;###autoload
 (defun ox-plumhtml-publish-to-html (plist filename pub-dir)
