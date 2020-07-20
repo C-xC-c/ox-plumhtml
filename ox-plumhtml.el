@@ -3,8 +3,8 @@
 
 ;; Author: Plum <boku@plum.moe>
 ;; Created: June 2020
-;; Package-Version: 1.1.0
-;; Keywords: org-export
+;; Package-Version: 1.2.0
+;; Keywords: files
 ;; URL: https://words.plum.moe/ox-plumhtml.html
 ;; Package-Requires: ((emacs "26.1") (ox-slimhtml "0.4.5"))
 
@@ -31,11 +31,15 @@
 (require 'ox-slimhtml)
 
 ;; Variables
-(defvar ox-plumhtml-export-header-ids nil)
+(defcustom ox-plumhtml-export-header-ids nil
+  "When non-nill adds HTML ids to header tags
+
+Enables linking to said headers from within the document"
+  :type '(boolean))
 
 ;; Utils
 (defun ox-plumhtml--table-header-p (element info)
-  "Return t if the table has a header else nil."
+  "Return t if the table has a header."
   (or (org-export-table-has-header-p element info)
       (org-export-table-has-header-p (org-export-get-parent-table element) info)))
 
@@ -93,9 +97,7 @@ Uses <th> for table headers"
 (defun ox-plumhtml-headline (headline contents info)
   (let* ((text (org-export-data (org-element-property :title headline) info))
          (level (org-export-get-relative-level headline info))
-         (attributes (org-element-property :ATTR_HTML headline))
-         (container (org-element-property :HTML_CONTAINER headline))
-         (container-class (and container (org-element-property :HTML_CONTAINER_CLASS headline))))
+         (attributes (org-element-property :ATTR_HTML headline)))
     (when attributes
       (setq attributes
             (format " %s" (org-html--make-attribute-string
