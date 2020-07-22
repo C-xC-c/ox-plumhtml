@@ -4,8 +4,56 @@ extensions to [[https://github.com/balddotcat/ox-slimhtml][ox-slimhtml]].
 
 Used to publish words I write.
 ** Installation
-You want to clone the repo, cd to it then do ~M-x package-install-file
-ox-plumhtml.el~
+You want to clone the repo, cd to it then do ~M-x
+package-install-file~ on ~ox-plumhtml.el~
+** Header IDs
+In org-mode you can do something like
+#+begin_example
+,#+plumhtml_header_ids:
+,* Header 1
+.....
+some content...
+.....
+,* Header 2
+[[Header 1][Link to header 1]]
+#+end_example
+And the link will jump back to =Header 1= when you click it.
+
+This is implemented in ox-plumhtml conditionally by setting the
+variable ~ox-plumhtml-export-header-ids~, or putting
+~#+plumhtml_header_ids: t~ in your org file.
+
+Exported contents look like this when set to nil:
+#+begin_src html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body><h1>Header 1</h1><p>.....
+some content...
+.....
+</p>
+<h1>Header 2</h1><p><a href="Header 1">Link to header 1</a>
+</p>
+</div></body>
+</html>
+#+end_src
+And this when non-nil:
+#+begin_src html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body><h1 id="orgffb8f9b">Header 1</h1><p>.....
+some content...
+.....
+</p>
+<h1 id="org89773e7">Header 2</h1><p><a href="#orgffb8f9b">Link to header 1</a>
+</p>
+</div></body>
+</html>
+#+end_src
+It adds some noise to the outputted file but it's worth it IMO.
 ** Functions
 *** ~ox-plumhtml-export-as-html~
 Makes a temporary buffer with the exported HTML.
