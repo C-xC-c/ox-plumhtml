@@ -48,13 +48,14 @@ Enables linking to said headers from within the document"
   "This is the same as `ox-slimhtml-paragraph' but doesn't add a
 <p> before export-snippet blocks like #+begin_src .... #+end_src"
   (when contents
-    (if (or (ox-slimhtml--immediate-child-of-p paragraph 'item)
-            (ox-slimhtml--immediate-child-of-p paragraph 'special-block)
-            (ox-slimhtml--has-immediate-child-of-p paragraph 'export-snippet))
-        contents
-      (if (ox-slimhtml--has-immediate-child-of-p paragraph 'link)
-          (format "<p>%s</p>" contents)
-        (format "<p%s>%s</p>" (ox-slimhtml--attr paragraph) contents)))))
+    (cond
+     ((or (ox-slimhtml--immediate-child-of-p paragraph 'item)
+          (ox-slimhtml--immediate-child-of-p paragraph 'special-block)
+          (ox-slimhtml--has-immediate-child-of-p paragraph 'export-snippet))
+      contents)
+     ((ox-slimhtml--has-immediate-child-of-p paragraph 'link)
+      (format "<p>%s</p>" contents))
+     (t (format "<p%s>%s</p>" (ox-slimhtml--attr paragraph) contents)))))
 
 (defun ox-plumhtml-table (table contents info)  
   (format "<table>%s</table>" contents))
@@ -104,7 +105,7 @@ Uses <th> for table headers"
                            (org-export-read-attribute 'attr_html `(nil
                                                                    (attr_html ,(split-string attributes))))))))
     (when (not (org-export-low-level-p headline info))
-      (if ox-plumhtml-export-header-ids
+      (if (plist-get info :export-header-ids)
           (format "<h%d id=\"%s\">%s</h%d>%s" level (org-export-get-reference headline info) text level (or contents ""))
         (format "<h%d%s>%s</h%d>%s" level (or attributes "") text level (or contents ""))))))
 
@@ -139,7 +140,7 @@ INFO is a plist holding contextual information."
                               path))
                     attributes contents)))
          ((and (string= "fuzzy" link-type)
-               ox-plumhtml-export-header-ids)
+               (plist-get info :export-header-ids))
           (format "<a href=\"#%s\"%s>%s</a>"
                   (org-export-get-reference (org-export-resolve-fuzzy-link link info) info)
                   attributes contents))
@@ -148,6 +149,12 @@ INFO is a plist holding contextual information."
 ;; org-export backend and export/publish functions
 (org-export-define-derived-backend 'plumhtml
     'slimhtml
+  :menu-entry
+  '(?p "Export to plumhtml"
+       ((?H "As plumhtml buffer" ox-slimhtml-export-as-html)
+        (?h "As plumhtml file" ox-slimhtml-export-to-html)))
+  :options-alist
+  '((:export-header-ids "PLUMHTML_HEADER_IDS" nil ox-plumhtml-export-header-ids t))
   :translate-alist
   '((table . ox-plumhtml-table)
     (table-row . ox-plumhtml-table-row)
