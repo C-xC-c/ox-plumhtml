@@ -89,11 +89,14 @@ Uses <th> for table headers"
       (format "<th>%s</th>" contents)
     (format "<td>%s</td>" contents)))
 
-(defun ox-plumhtml-code (code contents info)
+(defun ox-plumhtml-code (code _contents _info)
   (format "<code>%s</code>" (org-html-do-format-code (org-element-property :value code))))
 
-(defun ox-plumhtml-verbatim (verbatim contents info)
+(defun ox-plumhtml-verbatim (verbatim _contents _info)
   (format "<code>%s</code>" (org-element-property :value verbatim)))
+
+(defun ox-plumhtml-quote-block (_quote-block contents _info)
+  (format "<blockquote>\n%s</blockquote>" contents))
 
 (defun ox-plumhtml-headline (headline contents info)
   (let* ((text (org-export-data (org-element-property :title headline) info))
@@ -163,7 +166,8 @@ INFO is a plist holding contextual information."
     (code . ox-plumhtml-code)
     (verbatim . ox-plumhtml-verbatim)
     (headline . ox-plumhtml-headline)
-    (link . ox-plumhtml-link)))
+    (link . ox-plumhtml-link)
+    (quote-block . ox-plumhtml-quote-block)))
 
 ;;;###autoload
 (defun ox-plumhtml-publish-to-html (plist filename pub-dir)

@@ -4,7 +4,7 @@ extensions to [[https://github.com/balddotcat/ox-slimhtml][ox-slimhtml]].
 
 Used to publish words I write.
 ** Installation
-You want to clone the repo, cd to it then do ~M-x
+You want to [[https://github.com/C-xC-c/ox-plumhtml.git][clone]] [[https://git.flanchan.moe/c-xc-c/ox-plumhtml.git][the]] [[public@plum.moe:ox-plumhtml][repo]], cd to it then do ~M-x
 package-install-file~ on ~ox-plumhtml.el~
 ** Header IDs
 In org-mode you can do something like
