@@ -61,6 +61,11 @@
    "<h1 id=\"org[[:alnum:]]\\{7\\}\">mwee</h1>"
    "* mwee" '(:export-header-ids t)))
 
+(ert-deftest link-without-content ()
+  (should-render-as
+   "<p><a href=\"https://flanchan.moe\">https://flanchan.moe</a></p>"
+   "[[https://flanchan.moe]]"))
+
 ;; Links and IDs
 (ert-deftest link ()
   (should-render-as

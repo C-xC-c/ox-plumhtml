@@ -3,7 +3,7 @@
 
 ;; Author: Plum <boku@plum.moe>
 ;; Created: June 2020
-;; Package-Version: 1.2.0
+;; Package-Version: 1.2.1
 ;; Keywords: files
 ;; URL: https://words.plum.moe/ox-plumhtml.html
 ;; Package-Requires: ((emacs "26.1") (ox-slimhtml "0.4.5"))
@@ -120,20 +120,18 @@ INFO is a plist holding contextual information."
   (cond
    ((ox-slimhtml--immediate-child-of-p link 'link)
     (org-element-property :raw-link link))
-   ((not contents)
-    (format "<em>%s</em>" (org-element-property :path link)))
    (t (let ((link-type (org-element-property :type link))
             (href (org-element-property :raw-link link))
             (attributes (if (ox-slimhtml--immediate-child-of-p link 'paragraph)
                             (ox-slimhtml--attr (org-export-get-parent link))
                           ""))
-            (element "<a href=\"%s\"%s>%s</a>"))
+            (element "<a href=\"%s\"%s>%s</a>")
+            (path (or (org-element-property :path link) "")))
         (cond
          ((string= "file" link-type)
           (let ((html-extension (or (plist-get info :html-extension) ""))
                 (use-abs-url (plist-get info :html-link-use-abs-url))
-                (link-org-files-as-html (plist-get info :html-link-org-as-html))
-                (path (or (org-element-property :path link) "")))
+                (link-org-files-as-html (plist-get info :html-link-org-as-html)))
             (format element
                     (concat (if (and use-abs-url (file-name-absolute-p path)) "file:" "")
                             (if (and link-org-files-as-html (string= "org" (downcase (or (file-name-extension path) ""))))
@@ -143,11 +141,14 @@ INFO is a plist holding contextual information."
                               path))
                     attributes contents)))
          ((and (string= "fuzzy" link-type)
+               (not contents))
+          (format "<em>%s</em>" path))
+         ((and (string= "fuzzy" link-type)
                (plist-get info :export-header-ids))
           (format "<a href=\"#%s\"%s>%s</a>"
                   (org-export-get-reference (org-export-resolve-fuzzy-link link info) info)
                   attributes contents))
-         (t (format element href attributes contents)))))))
+         (t (format element href attributes (or contents href))))))))
 
 ;; org-export backend and export/publish functions
 (org-export-define-derived-backend 'plumhtml
