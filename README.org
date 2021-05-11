@@ -1,15 +1,15 @@
 * PlumHTML
-org-export backend for sane HTML. Basically some changes and
-extensions to [[https://github.com/balddotcat/ox-slimhtml][ox-slimhtml]]. 
+org-export backend for sane HTML. My personal continuation of the
+brilliant [[https://github.com/balddotcat/ox-slimhtml][ox-slimhtml]].
 
 Used to publish words I write.
 ** Installation
-You want to [[https://github.com/C-xC-c/ox-plumhtml.git][clone]] [[https://git.flanchan.moe/c-xc-c/ox-plumhtml.git][the]] [[public@plum.moe:ox-plumhtml][repo]], cd to it then do ~M-x
-package-install-file~ on ~ox-plumhtml.el~
+You want to clone the repo, then from within Emacs do ~M-x
+package-install-file~ on ~/path/to/repo/ox-plumhtml.el~
 ** Header IDs
 In org-mode you can do something like
 #+begin_example
-,#+plumhtml_header_ids:
+,#+plumhtml_header_ids: t
 ,* Header 1
 .....
 some content...
@@ -53,17 +53,15 @@ some content...
 </div></body>
 </html>
 #+end_src
-It adds some noise to the outputted file but it's worth it IMO.
 ** Functions
-*** ~ox-plumhtml-export-as-html~
-Makes a temporary buffer with the exported HTML.
-*** ~ox-plumhtml-export-to-html~
-Like ~ox-plumhtml-export-as-html~ but dumps the exported HTML to a
+- ~ox-plumhtml-export-as-html~
+	- Makes a temporary buffer with the exported HTML.
+- ~ox-plumhtml-export-to-html~
+	- Like ~ox-plumhtml-export-as-html~ but dumps the exported HTML to a
 file like =example.org= -> =example.html=
-*** ~ox-plumhtml-publish-to-html~
-Same as ~ox-plumhtml-export-as-html~ but for ~org-publish~
+- ~ox-plumhtml-publish-to-html~
+	- Same as ~ox-plumhtml-export-as-html~ but for ~org-publish~
 ** Tests
-I stole them from =ox-slimhtml= lole
 #+BEGIN_EXAMPLE
 emacs -batch \
       -l ert \
